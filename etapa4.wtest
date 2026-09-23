@@ -1,0 +1,69 @@
+import universidades.*
+import profesionales.*
+import empresas.*
+import solicitantes.*
+
+describe "Servicios Profesionales - Etapa 4 y Desafío" {
+  const univRosario = new Universidad(
+    provincia = "Santa Fe",
+    honorariosRecomendados = 2800
+  )
+  const univCorrientes = new Universidad(
+    provincia = "Corrientes",
+    honorariosRecomendados = 4200
+  )
+  const juana = new Profesional(
+    universidad = univRosario,
+    tipoDeProfesional = vinculado
+  )
+  const rocio = new Profesional(
+    universidad = univCorrientes,
+    tipoDeProfesional = libre,
+    honorariosPorHora = 5000,
+    provincias = #{"Santa Fe", "Cordoba"}
+  )
+  const luciana = new Profesional(
+    universidad = univRosario,
+    tipoDeProfesional = libre,
+    honorariosPorHora = 3200,
+    provincias = #{"Santa Fe", "Entre Rios"}
+  )
+  const empresa = new Empresa(honorarioDeReferencia = 3500)
+  const empresaConMas = new Empresa(honorarioDeReferencia = 3500)
+  const personaCba = new Persona(provincia = "Cordoba")
+  const personaSalta = new Persona(provincia = "Salta")
+  
+  method initialize() {
+    empresa.contratar(rocio)
+    empresaConMas.contratar(juana)
+    empresaConMas.contratar(luciana)
+  }
+  
+  test "Dar servicio a un cliente sumando cobranza y registro" {
+    empresa.darServicio(personaCba)
+    
+    assert.equals(1, empresa.cantidadDeClientes())
+    assert.that(empresa.tieneComoClienteA(personaCba))
+    
+    assert.equals(5000, rocio.recaudacion())
+  }
+  
+  test "Dar servicio a alguien que no se puede satisfacer no hace nada" {
+    empresa.darServicio(personaSalta)
+    
+    assert.equals(0, empresa.cantidadDeClientes())
+    assert.notThat(empresa.tieneComoClienteA(personaSalta))
+  }
+  
+  test "Desafio Final: Profesional poco atractivo" {
+    assert.notThat(empresaConMas.esPocoAtractivo(luciana))
+    
+    const asociadoFalso = new Profesional(
+      universidad = univRosario,
+      tipoDeProfesional = asociadosDelLitoral
+    )
+    empresaConMas.contratar(asociadoFalso)
+    
+    assert.that(empresaConMas.esPocoAtractivo(luciana))
+  }
+}

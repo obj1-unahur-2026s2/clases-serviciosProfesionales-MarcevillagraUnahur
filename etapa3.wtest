@@ -1,0 +1,50 @@
+import universidades.*
+import profesionales.*
+import empresas.*
+import solicitantes.*
+
+describe "Test etapa 3" {
+  const rosario = new Universidad(
+    provincia = "Santa Fe",
+    honorariosRecomendados = 2800
+  )
+  const corrientes = new Universidad(
+    provincia = "Corrientes",
+    honorariosRecomendados = 4200
+  )
+  const hurlingham = new Universidad(
+    provincia = "Buenos Aires",
+    honorariosRecomendados = 4000
+  )
+  const juana = new Profesional(
+    universidad = rosario,
+    tipoDeProfesional = vinculado
+  )
+  const pedro = new Profesional(
+    universidad = corrientes,
+    tipoDeProfesional = asociadosDelLitoral
+  )
+  const rocio = new Profesional(
+    universidad = hurlingham,
+    tipoDeProfesional = libre,
+    honorariosPorHora = 5000,
+    provincias = #{"Santa Fe", "Buenos Aires"}
+  )
+  
+  test "Juana cobra 10000 y le da la mitad a la Universidad" {
+    juana.recibirPago(10000)
+    assert.equals(5000, rosario.donaciones())
+  }
+  
+  test "Pedro cobra 7000 y dona todo a la asociacion" {
+    pedro.recibirPago(7000)
+    assert.equals(7000, asocDelLitoral.donaciones())
+  }
+  
+  test "Rocio cobra 10000 y le transfiere 2000 a Juana" {
+    rocio.recibirPago(10000)
+    rocio.transferirDineroA(juana, 2000)
+    assert.equals(8000, rocio.recaudacion())
+    assert.equals(2000, juana.recaudacion())
+  }
+}

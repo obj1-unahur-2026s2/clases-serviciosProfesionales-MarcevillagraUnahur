@@ -1,0 +1,51 @@
+import universidades.*
+import profesionales.*
+import empresas.*
+import solicitantes.*
+
+describe "Servicios Profesionales - Etapa 2" {
+
+  const rosario = new Universidad(provincia = "Santa Fe", honorariosRecomendados = 2800)
+  const corrientes = new Universidad(provincia = "Corrientes", honorariosRecomendados = 4200)
+  
+  const juana = new Profesional(universidad = rosario, tipoDeProfesional=vinculado)
+  const rocio = new Profesional(universidad = corrientes, tipoDeProfesional= libre,honorariosPorHora = 5000, provincias = #{"Santa Fe", "Córdoba"})
+  
+  const empresa = new Empresa(honorarioDeReferencia = 3500)
+  
+  const persona = new Persona(provincia = "Córdoba")
+  const institucion = new Institucion()
+  const club = new Club()
+  
+  method initialize() {
+    empresa.contratar(juana)
+    empresa.contratar(rocio)
+    
+    institucion.agregarUniversidad(corrientes)
+    
+    club.agregarProvincia("Buenos Aires")
+    club.agregarProvincia("Santa Fe")
+  }
+
+  test "Persona en Córdoba puede ser atendida por Rocio pero no por Juana" {
+    assert.that(persona.puedeSerAtendidoPor(rocio))
+    assert.notThat(persona.puedeSerAtendidoPor(juana))
+    assert.that(empresa.puedeSatisfacer(persona))
+  }
+  
+  test "Institucion que reconoce Corrientes puede ser atendida por Rocio pero no por Juana" {
+    assert.that(institucion.puedeSerAtendidoPor(rocio)) 
+    assert.notThat(institucion.puedeSerAtendidoPor(juana)) 
+    assert.that(empresa.puedeSatisfacer(institucion))
+  }
+  
+  test "Club en BA y SF puede ser atendido por Juana y por Rocio" {
+    assert.that(club.puedeSerAtendidoPor(juana)) 
+    assert.that(club.puedeSerAtendidoPor(rocio)) 
+  }
+  
+  test "Si una persona vive en Salta, la empresa no la puede satisfacer" {
+    const salteño = new Persona(provincia = "Salta")
+    assert.notThat(empresa.puedeSatisfacer(salteño))
+  }
+}

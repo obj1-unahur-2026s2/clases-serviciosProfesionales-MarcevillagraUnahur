@@ -1,0 +1,71 @@
+import universidades.*
+import profesionales.*
+import empresas.*
+
+describe "testEtapa1" {
+  const sanMartin = new Universidad(
+    provincia = "Buenos Aires",
+    honorariosRecomendados = 3500
+  )
+  const rosario = new Universidad(
+    provincia = "Santa Fe",
+    honorariosRecomendados = 2800
+  )
+  const corrientes = new Universidad(
+    provincia = "Corrientes",
+    honorariosRecomendados = 4200
+  )
+  const hurlingham = new Universidad(
+    provincia = "Buenos Aires",
+    honorariosRecomendados = 8800
+  )
+  const juana = new Profesional(
+    universidad = rosario,
+    tipoDeProfesional = vinculado
+  )
+  const melina = new Profesional(
+    universidad = corrientes,
+    tipoDeProfesional = asociadosDelLitoral
+  )
+  const rocio = new Profesional(
+    universidad = hurlingham,
+    tipoDeProfesional = libre,
+    provincias = #{"Buenos Aires", "Santa Fe", "Cordoba"},
+    honorariosPorHora = 5000
+  )
+  const luciana = new Profesional(
+    universidad = rosario,
+    tipoDeProfesional = libre,
+    provincias = #{"Santa Fe", "Entre Rios"},
+    honorariosPorHora = 3200
+  )
+  const total = new Empresa(
+    honorarioDeReferencia = 3500,
+    profesionales = #{juana, melina, rocio, luciana}
+  )
+  method initialize() {
+    total.contratar(juana)
+    total.contratar(melina)
+    total.contratar(rocio)
+    total.contratar(luciana)
+  }
+
+  test "Profesionales por universidad: 2 de Rosario, 1 de Hurlingham y 0 de San Martin" {
+    assert.equals(2, total.cuantosDeLaUniversidad(rosario))
+    assert.equals(1, total.cuantosDeLaUniversidad(hurlingham))
+    assert.equals(0, total.cuantosDeLaUniversidad(sanMartin))
+  }
+  test "Profesionales caros: solo Rocio supera los honorarios de referencia (3500)" {
+    assert.equals(#{rocio}, total.profesionalesCaros())
+  }
+  test "Universidades formadoras: Rosario, Corrientes y Hurlingham" {
+    assert.equals(#{rosario, corrientes, hurlingham}, total.universidadesFormadoras())
+  }
+  test "Profesional mas barato: es Juana (cobra 2800 de Rosario)" {
+    assert.equals(juana, total.profesionalMasBarato())
+  }
+  test "Es de gente acotada: todos tienen a lo sumo 3 provincias habilitadas" {
+    assert.that(total.esGenteAcotada())
+  }
+
+}
